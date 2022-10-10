@@ -1,31 +1,31 @@
-let urlApi = "http://localhost:3000/api/products";
+let urlApi = "http://localhost:3000/api/products"; // Lien de l'api
 
-let truc =fetch(urlApi)
-    .then(function(resultats) {
-        if (resultats.ok) {
-            resultats.json().then(function(donnees) {
-                let article =``;
-                for (let kanap of donnees) {
-                    article +=`<a href="./product.html.id=${kanap._id}">`;
-                    article +=`<article>`;
-                    article +=`<img src="${kanap.imageUrl}" alt="${kanap.altTxt}">`;
-                    article +=`<h3 class="productName">${kanap.name}</h3>`;
-                    article +=`<p class="productDescription">${kanap.description}</p>`;
-                    article +=`</article>`;
-                    article +=`</a>`;
-                }
-                document.querySelector("#items").innerHTML = article;
-            });
+fetch(urlApi) //requete GET sur l'api
+    .then( // vérifie si on a bien récupéré les données
+        function(resultats) { 
+            if (resultats.ok) {
+                resultats.json().then( //créer un article avec ses données pour chaque objets de la requete
+                    function(donnees) {
+                        let article =``;
+                        for (let kanap of donnees) { //pour chaque objet dans données, on rempli le HTML
+                            article +=`<a href="./product.html.id=${kanap._id}">`;
+                            article +=`<article>`;
+                            article +=`<img src="${kanap.imageUrl}" alt="${kanap.altTxt}">`;
+                            article +=`<h3 class="productName">${kanap.name}</h3>`;
+                            article +=`<p class="productDescription">${kanap.description}</p>`;
+                            article +=`</article>`;
+                            article +=`</a>`;
+                        }
+                        document.querySelector("#items").innerHTML = article; //on insert les articles dans le HTML
+                    }
+                );
+            }
         }
-    })
-    .catch(function(err) {
-        // Une erreur est survenue
-    })
+    )
+    .catch( // si il n'a pas réussi a faire le then
+        function(err) {
+            let article = `<p>Les articles n'ont pas pu se charger, verifiez que le serveur local est bien lancé</p>`;
+            document.querySelector("#items").innerHTML = article;
+        }
+    )
 ; 
-//<a href="./product.html?id=42">
-//          <article>
-//           <img src=".../product01.jpg" alt="Lorem ipsum dolor sit amet, Kanap name1">
-//         <h3 class="productName">Kanap name1</h3>
-//         <p class="productDescription">Dis enim malesuada risus sapien gravida nulla nisl arcu. Dis enim malesuada risus sapien gravida nulla nisl arcu.</p>
-//       </article>
-//     </a> -->

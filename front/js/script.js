@@ -4,11 +4,11 @@ fetch(urlApi) //requete GET sur l'api
     .then( // vérifie si on a bien récupéré les données
         function(resultats) { 
             if (resultats.ok) {
-                resultats.json().then( //créer un article avec ses données pour chaque objets de la requete
+                resultats.json().then( //convertion données json en javascript
                     function(donnees) {
                         let article =``;
                         for (let kanap of donnees) { //pour chaque objet dans données, on rempli le HTML
-                            article +=`<a href="./product.html.id=${kanap._id}">`;
+                            article +=`<a href="./product.html?id=${kanap._id}">`;
                             article +=`<article>`;
                             article +=`<img src="${kanap.imageUrl}" alt="${kanap.altTxt}">`;
                             article +=`<h3 class="productName">${kanap.name}</h3>`;

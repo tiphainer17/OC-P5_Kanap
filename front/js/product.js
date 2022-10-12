@@ -73,6 +73,7 @@ function ajoutAuPanier(kanap){
         } else { //sinon demande de les remplir
                         alert("Veuillez remplir les informations de couleur et quantité");
         }
+        alert("Produit ajouté au panier!")
     });
 
 }

@@ -5,8 +5,6 @@ let params = new URL(document.location).searchParams; //cherche les parametre da
 let id = params.get("id"); //cible le parametre id
 let urlApi = "http://localhost:3000/api/products/"+id; //lien de l'api par id
 
-
-//localStorage.clear();
 /****************************************/
 /*  AFFICHAGE DES DONNEES SUR LA PAGE   */
 /****************************************/
@@ -42,7 +40,7 @@ function ajoutAuPanier(kanap){
                         
                         let panier = JSON.parse(localStorage.getItem("panier")); 
                         if (panier !==null){ //si panier existe
-                            let bool=false;
+                            let bool=false; //n'a pas trouvé d'article similaire 
                             for(let list of panier){ //pour chaque element du panier on verifie, 
                                 if(produitToAdd.id == list.id && produitToAdd.color == list.color) {//si l'objet est deja present
                                     let quantiteTotal = list.quantite + produitToAdd.quantite;
@@ -58,28 +56,20 @@ function ajoutAuPanier(kanap){
                                     //on le remplace par la combinaison des quantités
                                     panier.push(produitToAddDouble);
                                     localStorage.setItem("panier",JSON.stringify(panier));
-                                    produitToAddDouble= {};
-                                    quantiteTotal = 0;
-                                    bool=true;
-                                    break;
-
+                                    bool=true; //a trouvé un article similaire
+                                    break; // on quitte la boucle une fois article similaire trouvé pour pas repasser dessus son reajout
                                 }
                             }
-                            if(!bool) { //sinon on ajoute notre nouvel objet
+                            if(!bool) { //si toute la boucle a été parcourru sans trouver d'article similaire, on ajoute
                                 panier.push(produitToAdd);
                                 localStorage.setItem("panier",JSON.stringify(panier));
                             }
-                            console.log(panier);
                         }
                         else { //sinon on le créer avant d'ajouter au panier
-                            console.log("else");
                             panier=[];
                             panier.push(produitToAdd);
                             localStorage.setItem('panier',JSON.stringify(panier));
-                            console.log(panier);
                         }
-                        produitToAdd={};
-
         } else { //sinon demande de les remplir
                         alert("Veuillez remplir les informations de couleur et quantité");
         }

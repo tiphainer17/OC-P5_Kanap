@@ -1,5 +1,5 @@
 /****************************************/
-/*    INITIALISATION VARIABLE UTILE     */
+/*   INITIALISATION VARIABLES UTILE     */
 /****************************************/
 let urlApi="http://localhost:3000/api/products/"//url standard de l'api
 let panier = JSON.parse(localStorage.getItem("panier")); //on recupere le contenu du localstorage
@@ -41,9 +41,44 @@ function affichagePanier(list,kanap){
     document.querySelector("#totalPrice").textContent=`${prixTotal}`;                         
 }
 
+/****************************************/
+/*     MODIFICATION D'UNE QUANTITE      */
+/****************************************/
+function demandeModification(){
+    //event quand on quitte la case
+    //recup info class itemQuantity
+    //modif dans localstorage
+    //(chercher .find)
+    //window.location.reload();
+}
 
 
-//recuperation valeur id de chaque article
+/****************************************/
+/*       SUPPRESSION D'UN ARTICLE       */
+/****************************************/
+function demandeSuppression(list){
+    document.querySelector("#deleteItem").addEventListener("click",function(event) {
+        event.preventDefault();
+        index = panier.indexOf(list);
+        panier.splice(index,1);
+        
+        /*let articleASupprimer = document.querySelector("#cart__item");
+        articleASupprimer.dataset.id;
+        articleASupprimer.dataset.color;
+        console.log(articleASupprimer);*/
+
+
+        /*localStorage.clear();
+        localStorage.setItem("panier",JSON.stringify(panier));*/
+        
+        window.location.reload();
+    });
+}
+
+
+/****************************************/
+/*           MAIN DE LA PAGE            */
+/****************************************/
 if (panier !==null){ //si le contenu du panier n'est pas vide
     for(let list of panier){ // on parcours tout le localstorage
         let urlApiId= urlApi+list.id;//on ajoute a l'url standard le numero de l'id du kanap parcouru actuellement
@@ -54,6 +89,8 @@ if (panier !==null){ //si le contenu du panier n'est pas vide
                         resultat.json().then(
                             function(kanap){
                                 affichagePanier(list,kanap);//on affiche les valeurs du kanap actuel
+                                demandeModification();//au clic sur modifier
+                                demandeSuppression(list);//au clic sur supprimé
                             }
                         )
                     }

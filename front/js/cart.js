@@ -56,23 +56,38 @@ function demandeModification(){
 /****************************************/
 /*       SUPPRESSION D'UN ARTICLE       */
 /****************************************/
-function demandeSuppression(list){
-    document.querySelector("#deleteItem").addEventListener("click",function(event) {
-        event.preventDefault();
-        index = panier.indexOf(list);
-        panier.splice(index,1);
-        
-        /*let articleASupprimer = document.querySelector("#cart__item");
-        articleASupprimer.dataset.id;
-        articleASupprimer.dataset.color;
-        console.log(articleASupprimer);*/
-
-
-        /*localStorage.clear();
-        localStorage.setItem("panier",JSON.stringify(panier));*/
-        
-        window.location.reload();
-    });
+function demandeSuppression(){
+    /*let boutonSupprime = document.querySelectorAll(".deleteItem");
+    let leProduit = document.querySelectorAll(".cart__item");
+    console.log(leProduit);
+    boutonSupprime.forEach((boutonSupprime) => { //pour chaque element "supprimer",
+        boutonSupprime.addEventListener("click",function(event) { //on attend un clic
+            event.preventDefault(); //suppression comportement par defaut de onClick
+            for (let i = 0; i < panier.length; i++) { //pour chaque element element du panier
+                console.log('for');
+                console.log(panier[i]);
+                if ( //on verifie si il correspond aux attributs du html
+                    panier[i].id === leProduit[i].dataset.id &&
+                    panier[i].color === leProduit[i].dataset.color
+                  ) {
+                    panier.splice(panier[i],1);//on supprime
+                    localStorage.setItem("panier",JSON.stringify(panier));
+                    //window.location.reload();
+                  }
+            }
+        }); 
+    });   */
+    let boutonSupprime = document.querySelectorAll(".deleteItem");
+    for (let i = 0; i < boutonSupprime.length; i++){
+        boutonSupprime[i].addEventListener("click",function(event) {
+            event.preventDefault();
+            let articleASupprimer = panier[i].id;
+            panier.splice(articleASupprimer,1);
+            //panier = panier.filter(panier[i] => panier[i].id != panier[i].id);
+            localStorage.setItem("panier",JSON.stringify(panier));
+            window.location.reload();
+        });
+    }
 }
 
 
@@ -89,8 +104,9 @@ if (panier !==null){ //si le contenu du panier n'est pas vide
                         resultat.json().then(
                             function(kanap){
                                 affichagePanier(list,kanap);//on affiche les valeurs du kanap actuel
-                                demandeModification();//au clic sur modifier
-                                demandeSuppression(list);//au clic sur supprimé
+                                /*demandeModification();//au clic sur modifier*/
+                                /*document.querySelector(".deleteItem").addEventListener("click",demandeSuppression.bind(index));*/
+                                demandeSuppression();//au clic sur supprimé
                             }
                         )
                     }

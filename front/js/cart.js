@@ -8,6 +8,43 @@ let prixTotal = 0;
 let article =``;
 
 /****************************************/
+/*           MAIN DE LA PAGE            */
+/****************************************/
+if (panier !==null && panier.length != 0){ //si le contenu du panier n'est pas vide
+    for(let list of panier){ // on parcours tout le localstorage
+        let urlApiId= urlApi+list.id;//on ajoute a l'url standard le numero de l'id du kanap parcouru actuellement
+        fetch(urlApiId) //on requete
+            .then(
+                function(resultat){
+                    if(resultat.ok){
+                        resultat.json().then(
+                            function(kanap){
+                                affichagePanier(list,kanap);//on affiche les valeurs du kanap actuel
+                                demandeModification();//au changement de quantité
+                                demandeSuppression();//au clic sur supprimé
+                            }
+                        )
+                    }
+                }
+            )
+            .catch(
+                function(err){
+                    alert("Veuillez vérifier votre connexion au service web")
+                }
+            )
+        ;
+
+    }
+    
+}
+else {
+    document.querySelector("#cart__items").innerHTML=`<p>Aucun produit ajouté au panier</p>`;
+    document.querySelector("#totalQuantity").textContent = `${quantiteTotal}`;
+    document.querySelector("#totalPrice").textContent=`${prixTotal}`;
+                            
+}
+
+/****************************************/
 /*  AFFICHAGE DES DONNEES SUR LA PAGE   */
 /****************************************/
 function affichagePanier(list,kanap){
@@ -43,41 +80,6 @@ function affichagePanier(list,kanap){
 
 
 /****************************************/
-/*     MODIFICATION D'UNE QUANTITE      */
-/****************************************/
-function demandeModification(){
-    //event quand on quitte la case
-    //recup info class itemQuantity
-    //modif dans localstorage
-    //(chercher .find)
-    //window.location.reload();
-    const cart = document.querySelectorAll(".cart__item");
-    /* manière de regarder ce que l'on a d'affiché dynamiquement grace au dataset
-     cart.forEach((cart) => {console.log("item panier en dataset: " + " " + cart.dataset.id + " " + cart.dataset.couleur + " " + cart.dataset.quantité); }); */
-    // On écoute ce qu'il se passe dans itemQuantity de l'article concerné
-    cart.forEach((cart) => {
-     cart.addEventListener("change", (eq) => {
-      // vérification d'information de la valeur du clic et son positionnement dans les articles
-      let panier = JSON.parse(localStorage.getItem("panier"));
-      // boucle pour modifier la quantité du produit du panier grace à la nouvelle valeur
-      for (article of panier)
-        if (
-          article.id === cart.dataset.id &&
-          cart.dataset.color === article.color
-        ) {
-          article.quantité = eq.target.value;
-          localStorage.panier = JSON.stringify(panier);
-          // on met à jour le dataset quantité
-          cart.dataset.quantité = eq.target.value;
-          // on joue la fonction pour actualiser les données
-          //totalProduit();
-        }
-    });
-  });
-}
-
-
-/****************************************/
 /*       SUPPRESSION D'UN ARTICLE       */
 /****************************************/
 function demandeSuppression(){
@@ -93,45 +95,26 @@ function demandeSuppression(){
             window.location.reload();//on refresh la page
         });
     }
-
-
-
 }
 
 /****************************************/
-/*           MAIN DE LA PAGE            */
+/*     MODIFICATION D'UNE QUANTITE      */
 /****************************************/
-if (panier !==null && panier.length != 0){ //si le contenu du panier n'est pas vide
-    for(let list of panier){ // on parcours tout le localstorage
-        let urlApiId= urlApi+list.id;//on ajoute a l'url standard le numero de l'id du kanap parcouru actuellement
-        fetch(urlApiId) //on requete
-            .then(
-                function(resultat){
-                    if(resultat.ok){
-                        resultat.json().then(
-                            function(kanap){
-                                affichagePanier(list,kanap);//on affiche les valeurs du kanap actuel
-                                demandeModification();//au clic sur modifier
-                                demandeSuppression();//au clic sur supprimé
-                            }
-                        )
-                    }
-                }
-            )
-            .catch(
-                function(err){
-                    alert("Veuillez vérifier votre connexion au service web")
-                }
-            )
-        ;
-
+function demandeModification(){
+    let quantiteHTML = document.querySelectorAll(".itemQuantity"); //on recupere tout les elements de quantite
+    for (let i = 0; i < quantiteHTML.length; i++){ // pour chaque element quantite
+        quantiteHTML[i].addEventListener("change" , (event) => { //on attend un changement
+            event.preventDefault();
+            //on recupere la quantité du panier et la nouvelle quantité
+            let quantityModif = panier[i].quantite;
+            let qttModifValue = quantiteHTML[i].valueAsNumber;
+            const resultFind = panier.find((el) => el.qttModifValue !== quantityModif);//cherche dans le panier la premiere quantite nouvelle pas egal a l'ancienne
+            resultFind.quantite = qttModifValue; //l'element trouvé se voit attribuer la nouvelle quantite
+            panier[i].quantite = resultFind.quantite; //on remplace la valeur dans le panier
+            localStorage.setItem("panier", JSON.stringify(panier)); //on actualise le panier
+            window.location.reload();//on refresh la page
+        })
     }
-    
 }
-else {
-    document.querySelector("#cart__items").innerHTML=`<p>Aucun produit ajouté au panier</p>`;
-    document.querySelector("#totalQuantity").textContent = `${quantiteTotal}`;
-    document.querySelector("#totalPrice").textContent=`${prixTotal}`;
-                            
-}
-console.log(panier);
+
+

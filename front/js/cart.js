@@ -35,15 +35,12 @@ function affichagePanier(list,kanap){
     document.querySelector("#cart__items").innerHTML=article;//on ajoute le contenu html du kanap actuel
 
     //on met a jour le total du panier
-    totalPrix(list,kanap);
-}
-
-function totalPrix(list, kanap){
     quantiteTotal += list.quantite;
     prixTotal += list.quantite*kanap.price;
     document.querySelector("#totalQuantity").textContent = `${quantiteTotal}`;
     document.querySelector("#totalPrice").textContent=`${prixTotal}`;  
 }
+
 
 /****************************************/
 /*     MODIFICATION D'UNE QUANTITE      */
@@ -84,43 +81,21 @@ function demandeModification(){
 /*       SUPPRESSION D'UN ARTICLE       */
 /****************************************/
 function demandeSuppression(){
-//     let boutonSupprime = document.querySelectorAll(".deleteItem");
-//     let leProduit = document.querySelectorAll(".cart__item");
-//     console.log(leProduit);
-//     boutonSupprime.forEach((boutonSupprime) => { //pour chaque element "supprimer",
-//         boutonSupprime.addEventListener("click",function(event) { //on attend un clic
-//             event.preventDefault(); //suppression comportement par defaut de onClick
-//             for (let i = 0; i < panier.length; i++) { //pour chaque element element du panier
-//                 console.log('for');
-//                 console.log(panier[i]);
-//                 if ( //on verifie si il correspond aux attributs du html
-//                     panier[i].id === leProduit[i].dataset.id &&
-//                     panier[i].color === leProduit[i].dataset.color
-//                   ) {
-//                     /*panier.splice(panier[i],1);//on supprime
-//                     localStorage.setItem("panier",JSON.stringify(panier));*/
-//                     console.log(panier[i].id);
-//                     console.log(panier[i].color);
-//                     console.log(leProduit[i].dataset.id);
-//                     console.log(leProduit[i].dataset.color);
-//                     //window.location.reload();
-//                   }
-//             }
-//         }); 
-//    });
-
-    let boutonSupprime = document.querySelectorAll(".deleteItem");
-    console.log(boutonSupprime.length);
-    for (let i = 0; i < boutonSupprime.length; i++){
-        boutonSupprime[i].addEventListener("click",function(event) {
+    let boutonSupprime = document.querySelectorAll(".deleteItem"); //on selectionne tout les p Supprimer
+    for (let i = 0; i < boutonSupprime.length; i++){ //on parcourt tout les p supprimer
+        boutonSupprime[i].addEventListener("click",function(event) { // au clic sur le i ieme supprimer
             event.preventDefault();
-            let articleASupprimer = panier[i]/*.id*/;
-            console.log(articleASupprimer);
-            panier.splice(articleASupprimer,1);
-            localStorage.setItem("panier",JSON.stringify(panier));
-            window.location.reload();
+            //on recupere l'id et la color du i ieme element
+            let idDelete = panier[i].id;
+            let colorDelete = panier[i].color;
+            panier = panier.filter( el => el.id !== idDelete || el.color !== colorDelete );//on filtre le contenu du localstorage panier pour eliminer celui ciblé
+            localStorage.setItem("panier", JSON.stringify(panier));//on actualise le panier
+            window.location.reload();//on refresh la page
         });
     }
+
+
+
 }
 
 /****************************************/
@@ -137,7 +112,6 @@ if (panier !==null && panier.length != 0){ //si le contenu du panier n'est pas v
                             function(kanap){
                                 affichagePanier(list,kanap);//on affiche les valeurs du kanap actuel
                                 demandeModification();//au clic sur modifier
-                                /*document.querySelector(".deleteItem").addEventListener("click",demandeSuppression.bind(index));*/
                                 demandeSuppression();//au clic sur supprimé
                             }
                         )

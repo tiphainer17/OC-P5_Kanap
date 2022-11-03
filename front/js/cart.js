@@ -35,12 +35,21 @@ if (panier !==null && panier.length != 0){ //si le contenu du panier n'est pas v
         ;
 
     }
+    formulaire(); //on traite le formulaire
     
 }
 else {
+    //indiquer que le panier est vide
     document.querySelector("#cart__items").innerHTML=`<p>Aucun produit ajouté au panier</p>`;
     document.querySelector("#totalQuantity").textContent = `${quantiteTotal}`;
     document.querySelector("#totalPrice").textContent=`${prixTotal}`;
+
+    //
+    let boutonCommander = document.querySelector("#order");
+    boutonCommander.addEventListener("click", function(event){
+        event.preventDefault();
+        alert("Vous ne pouvez pas commander, le panier est vide");
+    });
                             
 }
 
@@ -103,7 +112,7 @@ function demandeSuppression(){
 function demandeModification(){
     let quantiteHTML = document.querySelectorAll(".itemQuantity"); //on recupere tout les elements de quantite
     for (let i = 0; i < quantiteHTML.length; i++){ // pour chaque element quantite
-        quantiteHTML[i].addEventListener("change" , (event) => { //on attend un changement
+        quantiteHTML[i].addEventListener("change" , function(event) { //on attend un changement
             event.preventDefault();
             //on recupere la quantité du panier et la nouvelle quantité
             let quantityModif = panier[i].quantite;
@@ -113,8 +122,105 @@ function demandeModification(){
             panier[i].quantite = resultFind.quantite; //on remplace la valeur dans le panier
             localStorage.setItem("panier", JSON.stringify(panier)); //on actualise le panier
             window.location.reload();//on refresh la page
-        })
+        });
     }
 }
 
+/****************************************/
+/*       TRAITEMENT DU FORMULAIRE       */
+/****************************************/
+//recuperer les données
+//creer un objet contact contenant les info + panier
 
+function formulaire(){
+    //vérification des types de données entrée
+    let vert = "#def8d7"; //couleur champ valide
+    let rouge = "#f8d7d7"; //couleur champ invalide
+    let form = document.querySelector(".cart__order__form"); //on selectionne le formulaire
+    //on attend un evenement sur prenom
+    form.firstName.addEventListener("change", function(event){
+        event.preventDefault;
+        if (isValidText(this.value)){
+            event.target.style.backgroundColor = vert;
+        } else {
+            event.target.style.backgroundColor = rouge;
+        }
+    });
+    //on attend un evenement sur nom
+    form.lastName.addEventListener("change", function(event){
+        event.preventDefault;
+        if (isValidText(this.value)){
+            event.target.style.backgroundColor = vert;
+        } else {
+            event.target.style.backgroundColor = rouge;
+        }
+    });
+    //on attend un evenement sur adresse
+    form.address.addEventListener("change", function(event){
+        event.preventDefault;
+        if (isValidAddress(this.value)){
+            event.target.style.backgroundColor = vert;
+        } else {
+            event.target.style.backgroundColor = rouge;
+        }
+    });
+    //on attend un evenement sur ville
+    form.city.addEventListener("change", function(event){
+        event.preventDefault;
+        if (isValidCity(this.value)){
+            event.target.style.backgroundColor = vert;
+        } else {
+            event.target.style.backgroundColor = rouge;
+        }
+    });
+    //on attend un evenement sur email
+    form.email.addEventListener("change", function(event){
+        event.preventDefault;
+        if (isValidEmail(this.value)){
+            event.target.style.backgroundColor = vert;
+        } else {
+            event.target.style.backgroundColor = rouge;
+        }
+    });
+
+    //envoie du formulaire
+    let boutonCommander = document.querySelector("#order"); //selection du bouton commande
+    boutonCommander.addEventListener("click", function(event){ //au click sur le bouton commande
+        event.preventDefault();
+        if( isValidText(form.firstName.value)
+            && isValidText(form.lastName.value)
+            && isValidAddress(form.address.value)
+            && isValidCity(form.city.value)
+            && isValidEmail(form.email.value)){ //si tout les champs du formulaire respectent les conditions
+                    let panierValider = []; // contenu de la commande
+                    for (let produit of panier){ //on ajoute un a un a la commande le contenu du localstorage
+                        panierValider.push(produit);
+                    }
+                    let contact = { 
+                        infoClient : {
+                            firstName : form.firstName.value,
+                            lastName : form.lastName.value,
+                            address : form.address.value,
+                            city : form.city.value,
+                            email : form.email.value
+                        },
+                        commande : panierValider
+                    } // on créé un objet contenant le contenu du formulaire + la commande
+                    console.log(contact);
+            }
+    });
+}
+ 
+//Tests de validité avec Regex
+ function isValidText(aTest){ //Prenom/Nom
+    return /^[A-Za-zèéàêë]{2,20}$/.test(aTest);
+}
+function isValidAddress(aTest){ //Adresse
+    return /^([0-9]*) ([a-zA-Z-èéàêë ]*)$/.test(aTest);
+}
+function isValidCity(aTest){ //Ville
+    return /^([a-zA-Z-èéàêë ]*)$/.test(aTest);
+}
+function isValidEmail(aTest){ // Email
+    return /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/.test(aTest);
+}

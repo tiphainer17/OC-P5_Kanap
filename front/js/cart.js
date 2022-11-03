@@ -129,9 +129,21 @@ function demandeModification(){
 /****************************************/
 /*       TRAITEMENT DU FORMULAIRE       */
 /****************************************/
-//recuperer les données
-//creer un objet contact contenant les info + panier
+//Tests de validité avec Regex
+function isValidText(aTest){ //Prenom/Nom
+    return /^[A-Za-zèéàêë]{2,20}$/.test(aTest);
+}
+function isValidAddress(aTest){ //Adresse
+    return /^([0-9]*) ([a-zA-Z-èéàêë ]*)$/.test(aTest);
+}
+function isValidCity(aTest){ //Ville
+    return /^([a-zA-Z-èéàêë ]*)$/.test(aTest);
+}
+function isValidEmail(aTest){ // Email
+    return /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/.test(aTest);
+}
 
+//Traitement du formulaire
 function formulaire(){
     //vérification des types de données entrée
     let vert = "#def8d7"; //couleur champ valide
@@ -140,7 +152,7 @@ function formulaire(){
     //on attend un evenement sur prenom
     form.firstName.addEventListener("change", function(event){
         event.preventDefault;
-        if (isValidText(this.value)){
+        if (isValidText(this.value)){ //si regex ok
             event.target.style.backgroundColor = vert;
         } else {
             event.target.style.backgroundColor = rouge;
@@ -149,7 +161,7 @@ function formulaire(){
     //on attend un evenement sur nom
     form.lastName.addEventListener("change", function(event){
         event.preventDefault;
-        if (isValidText(this.value)){
+        if (isValidText(this.value)){ //si regex ok
             event.target.style.backgroundColor = vert;
         } else {
             event.target.style.backgroundColor = rouge;
@@ -158,7 +170,7 @@ function formulaire(){
     //on attend un evenement sur adresse
     form.address.addEventListener("change", function(event){
         event.preventDefault;
-        if (isValidAddress(this.value)){
+        if (isValidAddress(this.value)){ //si regex ok
             event.target.style.backgroundColor = vert;
         } else {
             event.target.style.backgroundColor = rouge;
@@ -167,7 +179,7 @@ function formulaire(){
     //on attend un evenement sur ville
     form.city.addEventListener("change", function(event){
         event.preventDefault;
-        if (isValidCity(this.value)){
+        if (isValidCity(this.value)){ //si regex ok
             event.target.style.backgroundColor = vert;
         } else {
             event.target.style.backgroundColor = rouge;
@@ -176,7 +188,7 @@ function formulaire(){
     //on attend un evenement sur email
     form.email.addEventListener("change", function(event){
         event.preventDefault;
-        if (isValidEmail(this.value)){
+        if (isValidEmail(this.value)){ //si regex ok
             event.target.style.backgroundColor = vert;
         } else {
             event.target.style.backgroundColor = rouge;
@@ -194,33 +206,37 @@ function formulaire(){
             && isValidEmail(form.email.value)){ //si tout les champs du formulaire respectent les conditions
                     let panierValider = []; // contenu de la commande
                     for (let produit of panier){ //on ajoute un a un a la commande le contenu du localstorage
-                        panierValider.push(produit);
+                        panierValider.push(produit.id);
                     }
-                    let contact = { 
-                        infoClient : {
-                            firstName : form.firstName.value,
-                            lastName : form.lastName.value,
-                            address : form.address.value,
-                            city : form.city.value,
-                            email : form.email.value
+                    // on créé un objet contenant le contenu du formulaire + la commande
+                    // /!\ appelation contact et products (que id), obligatoire pour que l'api arrive a lire l'objet
+                    let order = { 
+                        contact : {
+                            firstName: form.firstName.value,
+                            lastName: form.lastName.value,
+                            address: form.address.value,
+                            city: form.city.value,
+                            email: form.email.value
                         },
-                        commande : panierValider
-                    } // on créé un objet contenant le contenu du formulaire + la commande
-                    console.log(contact);
+                        products : panierValider
+                    } 
+                    //requete post sur l'api
+                    fetch("http://localhost:3000/api/products/order", {
+                        method: 'POST',
+                        body: JSON.stringify(order),
+                        headers: {
+                            'Accept': 'application/json', 
+                            "Content-Type": "application/json" 
+                        },
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        localStorage.clear(); //on vide le panier
+                        window.location.href = "confirmation.html?orderId="+`${data.orderId}`; //on envoie l'id de la commande dans l'url
+                    })
+                    .catch((err) => {
+                        alert ("Veuillez vérifiez votre requete" );
+                    });
             }
     });
-}
- 
-//Tests de validité avec Regex
- function isValidText(aTest){ //Prenom/Nom
-    return /^[A-Za-zèéàêë]{2,20}$/.test(aTest);
-}
-function isValidAddress(aTest){ //Adresse
-    return /^([0-9]*) ([a-zA-Z-èéàêë ]*)$/.test(aTest);
-}
-function isValidCity(aTest){ //Ville
-    return /^([a-zA-Z-èéàêë ]*)$/.test(aTest);
-}
-function isValidEmail(aTest){ // Email
-    return /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/.test(aTest);
 }
